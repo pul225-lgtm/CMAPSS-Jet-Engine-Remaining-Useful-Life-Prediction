@@ -1,28 +1,62 @@
-## Project Description
-Unplanned jet engine failure is a catastrophic safety and financial risk. While machine learning can predict the Remaining Useful Life (RUL) of engines, traditional models fail silently when environmental operating conditions change (Covariate Shift). This project develops a "Self-Healing" MLOps pipeline. It features an Operating Regime Normalizer and Exponentially Weighted Moving Averages (EWMA) to denoise telemetry. It utilizes a tuned XGBoost regressor optimized for the NASA Asymmetric Score (penalizing late warnings) and an unsupervised Gaussian Mixture Model (GMM) on a PCA manifold to detect live data drift, deployed via an interactive Streamlit application.
+# Drift-Resilient Predictive Maintenance for Jet Engines
 
-## Data Source
-The project utilizes the **NASA CMAPSS (Commercial Modular Aero-Propulsion System Simulation)** dataset. It consists of simulated run-to-failure turbofan engine degradation under varying flight regimes (altitude, Mach number, throttle).
-Source: [NASA Prognostics Data Repository](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/)
+## 1. Project Description
+Unplanned jet engine failure is a catastrophic safety and financial risk in the aviation industry. While machine learning models can predict the Remaining Useful Life (RUL) of engines, traditional models often fail silently when environmental operating conditions change—a phenomenon known as **Covariate Shift**. 
 
-## Packages Required
-To run this project, ensure you have Python 3.9+ and the following packages installed:
-* pandas
-* numpy
-* scikit-learn
-* xgboost
-* streamlit
-* plotly
-* matplotlib
-* seaborn
-* joblib
+This project develops a "Self-Healing" MLOps pipeline to address this challenge. The architecture features:
+* **Operating Regime Normalization:** Mathematically isolating mechanical degradation from environmental noise (altitude, Mach number).
+* **Exponentially Weighted Moving Averages (EWMA):** Denoising sensor telemetry without lagging the critical end-of-life signal.
+* **Supervised RUL Prediction:** A hyperparameter-tuned **XGBoost** regressor explicitly optimized for the official NASA Asymmetric Score, which strictly penalizes "late warnings" to prioritize passenger safety.
+* **Unsupervised Anomaly Monitor:** A Gaussian Mixture Model (GMM) fit on a PCA manifold to detect real-time data drift and unseen fault modes.
+* **Interactive Deployment:** A Streamlit dashboard that provides mechanics with RUL predictions, bootstrapped safety windows (95% CI), and physically de-anonymized diagnostic alerts.
 
-You can install these via: `pip install -r requirements.txt`
+## 2. Data Source
+The project utilizes the **NASA CMAPSS (Commercial Modular Aero-Propulsion System Simulation)** dataset. It consists of simulated run-to-failure turbofan engine degradation under varying flight regimes.
 
-## Instructions to Run the Code
-1. Clone this repository to your local machine.
-2. Download the CMAPSS dataset and place the `.txt` files into the `/data` directory (see `/data/readme_data.txt` for details).
-3. (Optional) Run `aux_1.py` (or the Jupyter Notebook) to train the models and export the `.joblib` artifacts to the `/models` folder.
-4. Run the Streamlit web application by executing the following command in your terminal:
-   `streamlit run main.py`
-5. Open the provided `localhost` URL in your web browser to interact with the dashboard.
+*   **FD001:** Single operating condition (used for baseline).
+*   **FD002:** 6 complex operating conditions (used for Covariate Shift and normalization testing).
+*   **FD004:** Unseen novel fault modes (used to test the unsupervised drift monitor against Concept Drift).
+
+**Access the Data:** 
+* [NASA Prognostics Data Repository](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/)
+* [Kaggle: CMAPSS Jet Engine Simulated Data](https://www.kaggle.com/datasets/palbha/cmapss-jet-engine-simulated-data)
+
+*(Note: Due to file size limitations, raw `.txt` data files are not tracked in this repository. See instructions below on how to add them).*
+
+## 3. Packages Required
+To run this project locally, ensure you have Python 3.9+ installed along with the following packages:
+* `pandas`
+* `numpy`
+* `scikit-learn`
+* `xgboost`
+* `streamlit`
+* `plotly`
+* `matplotlib`
+* `seaborn`
+* `joblib`
+
+You can install all dependencies quickly by running:  
+`pip install -r requirements.txt`
+
+## 4. Instructions on How to Run the Code
+
+**Step 1: Clone the Repository**
+```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+cd YOUR_REPO_NAME
+```
+
+**Step 2: Prepare the Data**
+1. Download the CMAPSS dataset from the links provided in Section 2.
+2. Extract the files and place `train_FD001.txt`, `test_FD001.txt`, `train_FD002.txt`, `test_FD002.txt`, and `test_FD004.txt` directly into the `/data` folder.
+3. Ensure the pre-processed sample engine CSVs (`train2_sample_engine.csv`, `test4_sample_engine.csv`) generated by the notebook are also in the `/data` folder. (See `data/readme_data.txt` for more details).
+
+**Step 3: Generate the Model Artifacts**
+Run the core training script/notebook (`aux_1.py` or your Jupyter Notebook) to execute the feature engineering, train the XGBoost and PCA/GMM models, and export the `.joblib` artifacts into the `/models` directory.
+
+**Step 4: Launch the Streamlit Web App**
+Once the models are saved, launch the interactive dashboard by running the following command in your terminal:
+```bash
+streamlit run main.py
+```
+This will open a local web server (usually `http://localhost:8501`) in your default browser where you can interact with the live Predictive Maintenance dashboard.
