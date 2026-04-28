@@ -24,9 +24,6 @@ def load_models():
 
     return kmeans, xgb_model, pca, gmm, regime_scalers, pca_scaler, conf_bounds
 
-# Load everything once
-kmeans, xgb_model, pca, gmm, regime_scalers, pca_scaler, conf_bounds = load_models()
-
 # -------------------------------------------------------------------
 # 2. THE LIVE FEATURE ENGINEERING PIPELINE (LEAK-FREE)
 # -------------------------------------------------------------------

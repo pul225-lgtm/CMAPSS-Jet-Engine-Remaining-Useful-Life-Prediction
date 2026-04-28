@@ -2,11 +2,15 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from aux_1 import engineer_features_live, get_live_confidence, get_status_pill
+from aux_1 import load_models, engineer_features_live, get_live_confidence, get_status_pill
 
 # -------------------------------------------------------------------
 # STREAMLIT UI LAYOUT
 # -------------------------------------------------------------------
+
+# Load everything once
+kmeans, xgb_model, pca, gmm, regime_scalers, pca_scaler, conf_bounds = load_models()
+
 st.title("✈️ Predictive Maintenance: Anomaly & RUL Monitor")
 
 # --- Sidebar Controls ---
